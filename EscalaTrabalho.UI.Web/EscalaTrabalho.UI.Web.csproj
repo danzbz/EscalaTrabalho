@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EscalaTrabalho.Model\EscalaTrabalho.Model.csproj" />
+  </ItemGroup>
+
 </Project>
