@@ -5,16 +5,27 @@
 
     <div class="col-12">
         <table id="eventos">
-            @foreach (var funcionario in Model.ListaFuncionario)
+            @foreach (var dia in Model.ListaDiasUteis)
             {
-                @foreach (var evento in funcionario.ListaEvento)
+                @foreach (var funcionario in dia.ListaFuncionarioNaEscala)
                 {
                     <tr>
-                        <td>@evento.Id</td>
+                        <td>@funcionario.Id</td>
                         <td>@funcionario.NmFuncionario</td>
-                        <td>@evento.DtInicio.ToString("yyyy-MM-dd")</td>
+                        <td>@dia.DtInicio.ToString("yyyy-MM-dd")</td>
                     </tr>
                 }
+            }
+        </table>
+
+        <table id="eventosFeriados">
+            @foreach (var feriado in Model.ListaFeriadoPublico)
+            {
+                <tr>
+                    <td>@feriado.Global</td>
+                    <td>@feriado.LocalName</td>
+                    <td>@feriado.Date.ToString("yyyy-MM-dd")</td>
+                </tr>
             }
         </table>
     </div>
@@ -48,8 +59,27 @@
             eventsArr.push(eventObj);
         }
 
+        let tabelaFeriado = document.getElementById("eventosFeriados");
+        let trFeriado = tabelaFeriado.getElementsByTagName("tr");
+        console.log(trFeriado);
+        for (let tr of trFeriado) {
+            console.log(tr);
+            let tdElems = tr.getElementsByTagName("td");
+            let eventObj = {
+                id: tdElems[0].innerText,
+                title: tdElems[1].innerText,
+                start: tdElems[2].innerText,
+            }
+
+            console.log(eventObj.start);
+
+            eventsArr.push(eventObj);
+        }
+
         return eventsArr;
     }
+
+
 
     function initCalendar() {
 
