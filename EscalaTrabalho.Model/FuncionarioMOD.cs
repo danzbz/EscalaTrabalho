@@ -18,6 +18,6 @@
 
         public Int32 DiasDeHomeOfficeNaSemana { get; set; }
 
-        public Boolean NaoPodeFazerHomeEmConjunto { get; set; }
+        public String NaoPodeFazerHomeEmConjunto { get; set; }
     }
 }

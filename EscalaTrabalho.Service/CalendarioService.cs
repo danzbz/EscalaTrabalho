@@ -24,16 +24,14 @@ namespace EscalaTrabalho.Services
             {
                 using var jsonStream = await response.Content.ReadAsStreamAsync();
                 calendario.ListaFeriadoPublico = JsonSerializer.Deserialize<List<FeriadosPublicos>>(jsonStream, jsonSerializerOptions);
-
-                //Remover da lista de dias uteis os feriados
-                //calendario.ListaDiasUteis.RemoveAll(diaUtil => calendario.ListaFeriadoPublico.Any(feriado => feriado.Date.Date == diaUtil.DtInicio.Date));
             }
         }
 
         public static async Task ObterFinalSemana(CalendarioMOD calendario)
         {
-            int ano = 2024;
-            int mes = 2; // Fevereiro
+
+            int ano = DateTime.Now.Year;
+            int mes = DateTime.Now.Month; 
 
             // Obter o primeiro dia do mês
             DateTime primeiroDiaDoMes = new DateTime(ano, mes, 1);
@@ -58,61 +56,6 @@ namespace EscalaTrabalho.Services
             }
         }
 
-        //private void AtribuirHomeOffice(CalendarioMOD calendario)
-        //{
-        //    int maxFuncionariosPorDia = 2; // Máximo de 2 pessoas de home office por dia
-        //    int diasDeHomeOfficePorSemana = 2; // Máximo de 2 dias de home office por semana
-
-        //    Random rng = new Random(); // Criar uma instância de Random para embaralhar a lista de funcionários
-
-        //    int semanaAtual = -1; // Inicializa a semana como -1 para garantir que seja atribuído home office na primeira semana
-
-        //    foreach (var diaUtil in calendario.ListaDiasUteis)
-        //    {
-        //        if (calendario.ListaFeriadoPublico.Any(feriado => feriado.Date.Date == diaUtil.DtInicio.Date))
-        //        {
-        //            // Se for feriado, pular para o próximo dia útil
-        //            continue;
-        //        }
-
-        //        // Verificar se mudou de semana
-        //        int semana = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(diaUtil.DtInicio, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Sunday);
-        //        if (semana != semanaAtual)
-        //        {
-        //            semanaAtual = semana;
-        //            // Resetar os dias de home office dos funcionários para a nova semana
-        //            foreach (var funcionario in calendario.ListaFuncionario)
-        //            {
-        //                funcionario.DiasDeHomeOfficeNaSemana = 0;
-        //            }
-        //        }
-
-        //        // Embaralhar a lista de funcionários
-        //        var funcionariosEmbaralhados = calendario.ListaFuncionario.OrderBy(f => rng.Next()).ToList();
-
-        //        int funcionariosAdicionadosNoDia = 0;
-
-        //        foreach (var funcionario in funcionariosEmbaralhados)
-        //        {
-        //            if (funcionario.DiasDeHomeOfficeNaSemana >= diasDeHomeOfficePorSemana)
-        //            {
-        //                // Se o funcionário já atingiu o limite de home office para a semana, passar para o próximo
-        //                continue;
-        //            }
-
-        //            // Adicionar o funcionário à escala de home office para este dia útil
-        //            diaUtil.ListaFuncionarioNaEscala.Add(funcionario);
-        //            funcionario.DiasDeHomeOfficeNaSemana++;
-        //            funcionariosAdicionadosNoDia++;
-
-        //            // Se atingiu o máximo de funcionários por dia, sair do loop
-        //            if (funcionariosAdicionadosNoDia >= maxFuncionariosPorDia)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //    }
-        //}
 
         private void AtribuirHomeOffice(CalendarioMOD calendario)
         {
@@ -120,7 +63,7 @@ namespace EscalaTrabalho.Services
             int maxFuncionariosPorDiaExcecao = 3; // Máximo de 3 pessoas de home office por dia para exceções
             int maxDiasDeHomeOfficePorSemana = 2; // Máximo de 2 dias de home office por semana por funcionário
 
-            Random rng = new Random(); // Criar uma instância de Random para embaralhar a lista de funcionários
+            Random random = new Random(); // Criar uma instância de Random para embaralhar a lista de funcionários
 
             int semanaAtual = -1; // Inicializa a semana como -1 para garantir que seja atribuído home office na primeira semana
 
@@ -145,7 +88,7 @@ namespace EscalaTrabalho.Services
                 }
 
                 // Embaralhar a lista de funcionários
-                var funcionariosEmbaralhados = calendario.ListaFuncionario.OrderBy(f => rng.Next()).ToList();
+                var funcionariosEmbaralhados = calendario.ListaFuncionario.OrderBy(f => random.Next()).ToList();
 
                 int funcionariosAdicionadosNoDia = 0;
 
@@ -171,19 +114,18 @@ namespace EscalaTrabalho.Services
                         continue;
                     }
 
-                    // Verificar se o funcionário tem ID 1 ou ID 2 e se já existe outro funcionário com ID 1 ou ID 2 no dia
-                    if ((funcionario.Id == 1 || funcionario.Id == 2) && diaUtil.ListaFuncionarioNaEscala.Any(f => f.Id == 1 || f.Id == 2))
+                    if ((funcionario.NaoPodeFazerHomeEmConjunto == "S") && diaUtil.ListaFuncionarioNaEscala.Any(f => f.NaoPodeFazerHomeEmConjunto == "S"))
                     {
-                        // Se o funcionário tem ID 1 ou ID 2 e já existe outro funcionário com ID 1 ou ID 2 no dia, passar para o próximo
+                        // Se o funcionário nao pode ficar em conjunto com outro, passa para o prximo dia
                         continue;
                     }
 
-                    // Adicionar o funcionário à escala de home office para este dia útil
+                    // add o funcionário a escala de home office para este dia útila
                     diaUtil.ListaFuncionarioNaEscala.Add(funcionario);
                     funcionario.DiasDeHomeOfficeNaSemana++;
                     funcionariosAdicionadosNoDia++;
 
-                    // Se atingiu o máximo de funcionários por dia, sair do loop
+                    // se atingiu o máximo de funcionários por dia, sair do loop
                     if (funcionariosAdicionadosNoDia >= maxFuncionariosPorDia)
                     {
                         break;

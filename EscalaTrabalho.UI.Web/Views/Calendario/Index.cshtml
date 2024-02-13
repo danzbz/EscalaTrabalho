@@ -2,26 +2,27 @@
 
 <div class="row">
     <div class="col-12">
-        <form asp-action="Escala" asp-controller="Calendario" method="post">
+        <form id="formEscala" asp-action="Escala" asp-controller="Calendario" method="post">
             <table class="table" id="funcionarioTable">
                 <thead>
                     <tr>
-                        <td>Não podem fazer Home no mesmo dia</td>
+                        <td>Marcar como <b>"SIM"</b> os funcionários que não podem fazer Home Office no mesmo dia</td>
                         <td>Colaborador</td>
                         <td></td>
                     </tr>
                 </thead>
-
                 <tbody id="funcionarioBody">
                     @for (int i = 0; i < Model.ListaFuncionario.Count; i++)
                     {
                         <tr>
                             <td>
-                                <input type="checkbox" name="ListaFuncionario[@i].NaoPodeFazerHomeEmConjunto" />
+                                <select name="ListaFuncionario[@i].NaoPodeFazerHomeEmConjunto">
+                                    <option value="N">Não</option>
+                                    <option value="S">Sim</option>
+                                </select>
                             </td>
                             <td>
                                 <input type="text" name="ListaFuncionario[@i].NmFuncionario" value="@Model.ListaFuncionario[i].NmFuncionario" />
-                                <input type="hidden" name="ListaFuncionario[@i].Id" value="@Model.ListaFuncionario[i].Id" />
                                 <input type="hidden" name="ListaFuncionario[@i].QtdMaximaPorSemana" value="@Model.ListaFuncionario[i].QtdMaximaPorSemana" />
                                 <input type="hidden" name="ListaFuncionario[@i].DiasDeHomeOfficeNaSemana" value="@Model.ListaFuncionario[i].DiasDeHomeOfficeNaSemana" />
                             </td>
@@ -40,8 +41,16 @@
         var tableBody = document.getElementById("funcionarioBody");
         var newIndex = tableBody.children.length;
         var newRow = document.createElement("tr");
-        newRow.innerHTML = `<td><input type="checkbox" name="ListaFuncionario[${newIndex}].NaoPodeFazerHomeEmConjunto" /></td>
-                                <td><input type="text" name="ListaFuncionario[${newIndex}].NmFuncionario" /></td>`;
+        newRow.innerHTML = `<td>
+                                            <select name="ListaFuncionario[${newIndex}].NaoPodeFazerHomeEmConjunto">
+                                            <option value="N">Não</option>
+                                            <option value="S">Sim</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="ListaFuncionario[${newIndex}].NmFuncionario" />
+                                                <input type="hidden" name="ListaFuncionario[${newIndex}].Id" value="${newIndex}" />
+                                    </td>`;
         tableBody.appendChild(newRow);
     }
 </script>
