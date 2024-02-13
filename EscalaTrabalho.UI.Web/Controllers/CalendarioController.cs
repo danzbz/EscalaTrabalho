@@ -8,7 +8,14 @@ namespace EscalaTrabalho.UI.Web.Controllers
 {
     public class CalendarioController : Controller
     {
-        public async Task<IActionResult> IndexAsync()
+        public async Task<IActionResult> Index()
+        {
+            CalendarioMOD Calendario = new CalendarioMOD();
+            return View(Calendario);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Escala(CalendarioMOD dadosCalendario)
         {
 
             CalendarioService calendarioService = new CalendarioService();
@@ -17,7 +24,7 @@ namespace EscalaTrabalho.UI.Web.Controllers
             CalendarioMOD Calendario = new CalendarioMOD();
 
             // Lista de nomes de funcionários
-            string[] nomesFuncionarios = { "Danilo", "Maria", "João" , "Ota" };
+            string[] nomesFuncionarios = { "Danilo", "Maria", "João", "Ota" };
             Int32[] idFuncionario = { 1, 2, 3, 4, 5 };
 
 

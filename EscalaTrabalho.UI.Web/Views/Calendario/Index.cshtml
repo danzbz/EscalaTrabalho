@@ -1,107 +1,47 @@
 ﻿@model EscalaTrabalho.Model.CalendarioMOD
 
-
 <div class="row">
-
     <div class="col-12">
-        <table id="eventos">
-            @foreach (var dia in Model.ListaDiasUteis)
-            {
-                @foreach (var funcionario in dia.ListaFuncionarioNaEscala)
-                {
+        <form asp-action="Escala" asp-controller="Calendario" method="post">
+            <table class="table" id="funcionarioTable">
+                <thead>
                     <tr>
-                        <td>@funcionario.Id</td>
-                        <td>@funcionario.NmFuncionario</td>
-                        <td>@dia.DtInicio.ToString("yyyy-MM-dd")</td>
+                        <td>Não podem fazer Home no mesmo dia</td>
+                        <td>Colaborador</td>
+                        <td></td>
                     </tr>
-                }
-            }
-        </table>
+                </thead>
 
-        <table id="eventosFeriados">
-            @foreach (var feriado in Model.ListaFeriadoPublico)
-            {
-                <tr>
-                    <td>@feriado.Global</td>
-                    <td>@feriado.LocalName</td>
-                    <td>@feriado.Date.ToString("yyyy-MM-dd")</td>
-                </tr>
-            }
-        </table>
-    </div>
-
-    <div class="col-12">
-        <div id="calendar"></div>
+                <tbody id="funcionarioBody">
+                    @for (int i = 0; i < Model.ListaFuncionario.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="ListaFuncionario[@i].NaoPodeFazerHomeEmConjunto" />
+                            </td>
+                            <td>
+                                <input type="text" name="ListaFuncionario[@i].NmFuncionario" value="@Model.ListaFuncionario[i].NmFuncionario" />
+                                <input type="hidden" name="ListaFuncionario[@i].Id" value="@Model.ListaFuncionario[i].Id" />
+                                <input type="hidden" name="ListaFuncionario[@i].QtdMaximaPorSemana" value="@Model.ListaFuncionario[i].QtdMaximaPorSemana" />
+                                <input type="hidden" name="ListaFuncionario[@i].DiasDeHomeOfficeNaSemana" value="@Model.ListaFuncionario[i].DiasDeHomeOfficeNaSemana" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button type="button" onclick="adicionarFuncionario()">Adicionar Funcionário</button>
+            <button class="btn btn-success" type="submit">Enviar</button>
+        </form>
     </div>
 </div>
 
 <script>
-    let eventsArr = loadData();
-    let calendar = initCalendar();
-
-    function loadData() {
-        let eventsArr = [];
-
-        let todoTable = document.getElementById("eventos");
-        let trElem = todoTable.getElementsByTagName("tr");
-        console.log(trElem);
-        for (let tr of trElem) {
-            console.log(tr);
-            let tdElems = tr.getElementsByTagName("td");
-            let eventObj = {
-                id: tdElems[0].innerText,
-                title: tdElems[1].innerText,
-                start: tdElems[2].innerText,
-            }
-
-            console.log(eventObj.start);
-
-            eventsArr.push(eventObj);
-        }
-
-        let tabelaFeriado = document.getElementById("eventosFeriados");
-        let trFeriado = tabelaFeriado.getElementsByTagName("tr");
-        console.log(trFeriado);
-        for (let tr of trFeriado) {
-            console.log(tr);
-            let tdElems = tr.getElementsByTagName("td");
-            let eventObj = {
-                id: tdElems[0].innerText,
-                title: tdElems[1].innerText,
-                start: tdElems[2].innerText,
-            }
-
-            console.log(eventObj.start);
-
-            eventsArr.push(eventObj);
-        }
-
-        return eventsArr;
-    }
-
-
-
-    function initCalendar() {
-
-        console.log('entrou')
-
-        var calendarEl = document.getElementById('calendar');
-
-        let calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'pt-br',
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            events: eventsArr,
-        });
-
-        calendar.render();
-
-        console.log(calendar);
-
-        return calendar;
+    function adicionarFuncionario() {
+        var tableBody = document.getElementById("funcionarioBody");
+        var newIndex = tableBody.children.length;
+        var newRow = document.createElement("tr");
+        newRow.innerHTML = `<td><input type="checkbox" name="ListaFuncionario[${newIndex}].NaoPodeFazerHomeEmConjunto" /></td>
+                                <td><input type="text" name="ListaFuncionario[${newIndex}].NmFuncionario" /></td>`;
+        tableBody.appendChild(newRow);
     }
 </script>

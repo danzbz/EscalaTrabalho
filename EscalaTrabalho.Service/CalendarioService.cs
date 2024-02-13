@@ -171,6 +171,13 @@ namespace EscalaTrabalho.Services
                         continue;
                     }
 
+                    // Verificar se o funcionário tem ID 1 ou ID 2 e se já existe outro funcionário com ID 1 ou ID 2 no dia
+                    if ((funcionario.Id == 1 || funcionario.Id == 2) && diaUtil.ListaFuncionarioNaEscala.Any(f => f.Id == 1 || f.Id == 2))
+                    {
+                        // Se o funcionário tem ID 1 ou ID 2 e já existe outro funcionário com ID 1 ou ID 2 no dia, passar para o próximo
+                        continue;
+                    }
+
                     // Adicionar o funcionário à escala de home office para este dia útil
                     diaUtil.ListaFuncionarioNaEscala.Add(funcionario);
                     funcionario.DiasDeHomeOfficeNaSemana++;
