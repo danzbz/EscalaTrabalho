@@ -102,6 +102,7 @@
             "2": "green",
             "3": "purple",
             "4": "black",
+            "5": "ORANGE",
         };
         return mapeamentoCor[funcionarioId] || 'gray'; 
     }
@@ -123,33 +124,6 @@
             eventColor: function (arg) {
                 return arg.event.extendedProps.color;
             },
-            dateClick: function (info) {
-                let colaboradorId = prompt("Informe o ID do colaborador:");
-                if (colaboradorId) {
-                    let dataEvento = info.dateStr;
-                    let novoEvento = {
-                        id: colaboradorId + '-' + dataEvento,
-                        title: $('#colaborador-' + colaboradorId).text(),
-                        start: dataEvento,
-                        color: obterCorPorFuncionario(colaboradorId)
-                    };
-                    listaEventos.push(novoEvento);
-                    calendar.addEvent(novoEvento);
-                    atualizarContagemHomes(colaboradorId, 1); // Adiciona 1 à contagem
-                }
-            },
-            eventClick: function (info) {
-                if (confirm("Deseja realmente remover este evento?")) {
-                    let eventoId = info.event.id;
-                    let colaboradorId = eventoId.split('-')[0];
-                    let index = listaEventos.findIndex(evento => evento.id === eventoId);
-                    if (index !== -1) {
-                        listaEventos.splice(index, 1);
-                        calendar.getEventById(eventoId).remove();
-                        atualizarContagemHomes(colaboradorId, -1); // Subtrai 1 da contagem
-                    }
-                }
-            }
         });
 
         calendar.render();
@@ -158,10 +132,41 @@
     }
 
     // Função para atualizar a contagem de homes na tabela
-    function atualizarContagemHomes(colaboradorId, alteracao) {
-        let homesTd = $(`#homes-${colaboradorId}`);
+    // Função para atualizar a contagem de homes na tabela
+    function atualizarContagemHomes(colaboradorId, incremento) {
+        let homesTd = document.querySelector(`#homes-${colaboradorId}`);
         if (homesTd) {
-            homesTd.textContent = parseInt(homesTd.textContent) + alteracao;
+            let contagemAtual = parseInt(homesTd.innerText);
+            let novaContagem = incremento ? contagemAtual + 1 : contagemAtual - 1;
+            homesTd.innerText = novaContagem >= 0 ? novaContagem : 0; // Assegura que a contagem não seja negativa
         }
     }
+
+    // Atualização das funções dateClick e eventClick para chamar atualizarContagemHomes corretamente
+    calendar.on('dateClick', function (info) {
+        let colaboradorId = prompt("Informe o ID do colaborador:");
+        if (colaboradorId) {
+            let dataEvento = info.dateStr;
+            let eventoId = colaboradorId + '-' + dataEvento + '-' + new Date().getTime(); // Adiciona precisão de milissegundos para ID único
+            let novoEvento = {
+                id: eventoId,
+                title: document.querySelector('#colaborador-' + colaboradorId).textContent,
+                start: dataEvento,
+                color: obterCorPorFuncionario(colaboradorId)
+            };
+            listaEventos.push(novoEvento);
+            calendar.addEvent(novoEvento);
+            atualizarContagemHomes(colaboradorId, true); // Verdadeiro para incrementar
+        }
+    });
+
+    calendar.on('eventClick', function (info) {
+        if (confirm("Deseja realmente remover este evento?")) {
+            let eventoId = info.event.id;
+            let colaboradorId = eventoId.split('-')[0];
+            listaEventos = listaEventos.filter(evento => evento.id !== eventoId);
+            info.event.remove();
+            atualizarContagemHomes(colaboradorId, false); // Falso para decrementar
+        }
+    })
 </script>
